@@ -4,7 +4,6 @@ df -h
 free -h
 nproc
 cat /etc/os*
-env
 
 url=https://rom.jrchintu.ga/0:/CCACHE/ccache.tar.gz # Where cccahe is located, use your ones, from where you want to download ccache!
 
