@@ -47,7 +47,6 @@ echo "$rclone_config" >~/.config/rclone/rclone.conf
 
 # Env Variables
 rm -rf ./*.txt* ./*.md*
-export END="$(date -ud 83 minute +%s)"
 export ERROR_LOG1="ErrorLog.txt"
 export OUT_DIR="/tmp/rom/out/target/product/mido"
 export TZ=Asia/Kolkata
@@ -100,6 +99,7 @@ sleep 60
 
 # Build %'age and kill in 85m if build type is ccache
 if [[ "$BUILD_TYPE" = "ccache" ]]; then
+        export END="$(date -ud 83 minute +%s)"
 	while test ! -z "$(pidof soong_ui)"; do
 		sleep 120
 		BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
