@@ -156,6 +156,6 @@ for B6 in ./*txt; do
 done && tg "$(cat del.txt)"
 
 # Sleep while tmate is running
-Sleep 30m
+sleep 30m
 tgedit "$INFO" "$TEXT1""$NL""$(T1):STOPPED ALL FOR 30 MIN"
 tg "Use Tmate for 30m"
