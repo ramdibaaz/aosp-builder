@@ -4,7 +4,7 @@ cd /tmp/rom || exit
 #--------------------------EDIT FROM HERE--------------------------------
 export BOTAPI="$mybot"
 export ID="$chatid"
-export BUILD_TYPE="final" # final or ccache
+export BUILD_TYPE="ccache" # final or ccache
 export METALAVA="false"
 export CCACHESIZE="20G"
 export LUNCHCOMMAND="lunch aosp_mido-user"
