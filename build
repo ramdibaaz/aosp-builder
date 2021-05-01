@@ -119,7 +119,7 @@ fi
 for B4 in ./*txt; do
 	[[ -e "$B4" ]]
 	trim "$B4"
-	tgdoc "$B$" "Non-trimmed LOG"
+	tgdoc "$B4" "Non-trimmed LOG"
 	tgdoc "Trimmed-$B4" "Trimmed LOG"
 done && tgdoc "./out/*log" "out/*log"
 for B6 in ./*txt; do
