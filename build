@@ -116,23 +116,15 @@ else
         done
 fi
 
-# Upload ccache First
-cd /tmp || exit
-  tgedit "$INFO" "$TEXT1""$NL""$(T1):Uploading ccache"
-  com ccache 1
-  rclone copy ccache.tar.gz GDUP:ROM/CCACHE
-  tgedit "$INFO" "$TEXT1""$NL""$(T1):Ccache Uploaded"
-cd /tmp/rom || exit
-
 # Upload Rom If Zip Found
 if ls "$OUT_DIR"/*zip 1>/dev/null 2>&1; then
         tg "Build Succeed!"
         for LOOP in "$OUT_DIR"/*zip; do
                 [[ -e "$LOOP" ]]
-                rclone copy "$LOOP" GDUP:ROM/ZIP
+                rclone copy "$LOOP" GDUP:ROM/ZIP 
                 tgedit "$INFO" "$TEXT1""$NL""$(T1):Rom Uploaded"
                 tg "ROM URL:- https://rom.jrchintu.ga/0:/ZIP/$LOOP"
-        done
+        done &
 else
         tmate -S /tmp/tmate.sock new-session -d &&
                 tmate -S /tmp/tmate.sock wait tmate-ready &&
@@ -140,6 +132,14 @@ else
                 tgedit "$INFO" "$TEXT1""$NL$""$(T1):Build Failed OR Zip Not Found" &&
                 tg "$SENDSHELL""$NL""Failed or it's ccache build"
 fi
+
+# Upload ccache First
+cd /tmp || exit
+  tgedit "$INFO" "$TEXT1""$NL""$(T1):Uploading ccache"
+  com ccache 1
+  rclone copy ccache.tar.gz GDUP:ROM/CCACHE
+  tgedit "$INFO" "$TEXT1""$NL""$(T1):Ccache Uploaded"
+cd /tmp/rom || exit
 
 # Send logs
 for B4 in ./*txt; do
