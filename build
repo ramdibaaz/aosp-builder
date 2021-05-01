@@ -47,6 +47,7 @@ echo "$rclone_config" >~/.config/rclone/rclone.conf
 
 # Env Variables
 rm -rf ./*.txt* ./*.md*
+export END="$(date -ud 83 minute +%s)"
 export ERROR_LOG1="ErrorLog.txt"
 export OUT_DIR="/tmp/rom/out/target/product/mido"
 export TZ=Asia/Kolkata
@@ -103,8 +104,10 @@ if [[ "$BUILD_TYPE" = "ccache" ]]; then
 		sleep 120
 		BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
 		tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "echo $(ccache -s)"
-	done &
-	sleep 84m # Here if build fails we will not get any message need to fix it
+                if [[ "$(date -u +%s)" = "$END" ]]; then
+                        break
+                fi
+	done
 	kill %1
 	tgedit "$INFO" "$TEXT1""$NL""$(T1):Killed FOR CCACHE UPLOAD"
 else
