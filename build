@@ -83,8 +83,7 @@ tgedit "$INFO" "$TEXT1 $(T1):Env Setup And Lunch"
 
 # Make Metalava Seperately
 if
-        [[ "$METALAVA" = "true" ]] || [[ "$BUILD_TYPE" = "ccache" ]]
-then
+        [[ "$METALAVA" = "true" ]]; then
         tgedit "$INFO" "$TEXT1""$NL""$(T1):Metalava Build Started"
         export WITHOUT_CHECK_API=true
         make api-stubs-docs || echo no problem
@@ -106,7 +105,7 @@ if [[ "$BUILD_TYPE" = "ccache" ]]; then
                 BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
                 tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "echo $(ccache -s)"
         done &
-        sleep 84m # here if build fails we will not get any message need to fix it
+        sleep 84m  # Here if build fails we will not get any message need to fix it
         kill %1
         tgedit "$INFO" "$TEXT1""$NL""$(T1):Killed FOR CCACHE UPLOAD"
 else
