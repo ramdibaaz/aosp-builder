@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /tmp/rom # Depends on where source got synced
+cd /tmp/rom || exit # Depends on where source got synced
 
 # Normal build steps
 . build/envsetup.sh
@@ -19,30 +19,11 @@ ccache -z # Clear old stats, so monitor script will provide real ccache statisti
 #sleep 85m
 #kill %1
 #ccache -s
-#and dont use below codes for first 1 or 2 times, to get ccache uploaded,
 
-
-# upload function for uploading rom zip file! I don't want unwanted builds in my google drive haha!
-up(){
-	curl --upload-file $1 https://transfer.sh/$(basename $1); echo
-	# 14 days, 10 GB limit
-}
-
-# It's recommended to use google drive(rclone) as upload solution for coping with the time limit. Un-comment next 3 lines to upload with rclone in drive. Also change apon and junk according to your config name, uploading folder of drive
-#up(){
-#	time rclone copy $1 apon:junk -P # apon is my rclone config name, 
-#}
 
 tg(){
-	bot_api="$mybot"
-	your_telegram_id="chatid"
-	msg=$2 # No need to touch
-	curl -s "https://api.telegram.org/bot${bot_api}/sendmessage" --data "text=$msg&chat_id=${your_telegram_id}"
+	curl -s "https://api.telegram.org/bot""$mybot""/sendmessage" --data "text=$1&chat_id=$chatid"
 }
-
-id=571213272 # Your telegram id
-
-# Upload rom zip file if succeed to build! Send notification to tg! And send shell to tg if build fails!
 
 # Let's compile by parts! Coz of ram issue!
 make api-stubs-docs || echo no problem
@@ -50,7 +31,6 @@ make system-api-stubs-docs || echo no problem
 make test-api-stubs-docs || echo no problem
 
 make aex -j10 \
-	&& send_zip=$(up out/target/product/mido/*zip) && tg $id "Build Succeed!" \
-        && rclone copy "$send_zip" GDUP:ROM/ZIP
-	|| tmate -S /tmp/tmate.sock new-session -d && tmate -S /tmp/tmate.sock wait tmate-ready && send_shell=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') && tg $id "Build Failed" && tg $id "$send_shell" && ccache -s && sleep 2h
+	tg  "Build Succeed!" \
+        && rclone copy out/target/product/mido/*zip GDUP:ROM/ZIP || tmate -S /tmp/tmate.sock new-session -d && tmate -S /tmp/tmate.sock wait tmate-ready && send_shell=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') && tg "Build Failed" && tg "$send_shell" && ccache -s && sleep 2h
 ccache -s # Let's print ccache statistics finally
