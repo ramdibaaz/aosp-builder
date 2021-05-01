@@ -55,12 +55,12 @@ export NL=$'\n'
 # Build Info notification
 tg "New Build Starts
 $(date)
-IP:- $(
+IP:$(
 	curl ipinfo.io/ip
 	echo
 ) By $USER
-Type:- $BUILD_TYPE Metalava:- $METALAVA
-ccache:- $CCACHESIZE cores:- $(nproc)"
+Type:$BUILD_TYPE Metalava:$METALAVA
+ccache:$CCACHESIZE cores:$(nproc)"
 
 # Ci stats
 wget https://raw.githubusercontent.com/ramdibaaz/aosp-builder/main/extra && chmod +x ./extra && bash extra
