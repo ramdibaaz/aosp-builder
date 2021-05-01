@@ -119,13 +119,13 @@ else
 fi
 
 # Send logs
-for B4 in ./*txt; do
+for B4 in *txt; do
 	[[ -e "$B4" ]]
 	trim "$B4"
 	tgdoc "$B4" "Non-trimmed LOG"
 	tgdoc "Trimmed-$B4" "Trimmed LOG"
 done && tgdoc "./out/*log" "out/*log"
-for B6 in ./*txt; do
+for B6 in *txt; do
 	[[ -e "$B6" ]]
 	echo "$B6" >>del.txt
 	del "$B6" >>del.txt
