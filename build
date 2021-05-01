@@ -20,8 +20,8 @@ ccache -z                  # Clear old stats, so monitor script will provide rea
 #kill %1
 #ccache -s
 
-tg() {
-	curl -s "https://api.telegram.org/bot""$mybot""/sendmessage" --data "text=$1&chat_id=$chatid"
+function tg() {
+        curl -s "https://api.telegram.org/bot${botapi}/sendmessage" --data "text=$1&chat_id=${chatid}"
 }
 
 # Let's compile by parts! Coz of ram issue!
