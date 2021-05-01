@@ -79,19 +79,19 @@ export B2="$M_ID"
 # Post build Steps
 source ./build/envsetup.sh && eval "$LUNCHCOMMAND"
 tg "STAT" && export INFO="$M_ID"
-tgedit "$INFO" "$TEXT1 $(T1):-Env Setup And Lunch"
+tgedit "$INFO" "$TEXT1 $(T1):Env Setup And Lunch"
 
 # Make Metalava Seperately
 if
         [[ "$METALAVA" = "true" ]] || [[ "$BUILD_TYPE" = "ccache" ]]
 then
-        tgedit "$INFO" "$TEXT1""$NL""$(T1):-Metalava Build Started"
+        tgedit "$INFO" "$TEXT1""$NL""$(T1):Metalava Build Started"
         export WITHOUT_CHECK_API=true
         make api-stubs-docs || echo no problem
         make hiddenapi-lists-docs || echo no problem
         make system-api-stubs-docs || echo no problem
         make test-api-stubs-docs || echo no problem
-        tgedit "$INFO" "$TEXT1""$NL""$(T1):-Metalava Build Done"
+        tgedit "$INFO" "$TEXT1""$NL""$(T1):Metalava Build Done"
 fi
 
 # Final Build Start's Here
@@ -108,7 +108,7 @@ if [[ "$BUILD_TYPE" = "ccache" ]]; then
         done &
         sleep 84m # here if build fails we will not get any message need to fix it
         kill %1
-        tgedit "$INFO" "$TEXT1""$NL""$(T1):-Killed FOR CCACHE UPLOAD"
+        tgedit "$INFO" "$TEXT1""$NL""$(T1):Killed FOR CCACHE UPLOAD"
 else
         while test ! -z "$(pidof soong_ui)"; do
                 sleep 120
@@ -118,11 +118,11 @@ else
 fi
 
 # Upload ccache First
-tgedit "$INFO" "$TEXT1""$NL""$(T1):-Uploading ccache"
-  cd /tmp || exit
+cd /tmp || exit
+  tgedit "$INFO" "$TEXT1""$NL""$(T1):Uploading ccache"
   com ccache 1
   rclone copy ccache.tar.gz GDUP:ROM/CCACHE
-  tgedit "$INFO" "$TEXT1""$NL""$(T1):-Ccache Uploaded"
+  tgedit "$INFO" "$TEXT1""$NL""$(T1):Ccache Uploaded"
 cd /tmp/rom || exit
 
 # Upload Rom If Zip Found
@@ -131,14 +131,14 @@ if ls "$OUT_DIR"/*zip 1>/dev/null 2>&1; then
         for LOOP in "$OUT_DIR"/*zip; do
                 [[ -e "$LOOP" ]]
                 rclone copy "$LOOP" GDUP:ROM/ZIP
-                tgedit "$INFO" "$TEXT1""$NL""$(T1):-Rom Uploaded"
+                tgedit "$INFO" "$TEXT1""$NL""$(T1):Rom Uploaded"
                 tg "ROM URL:- https://rom.jrchintu.ga/0:/ZIP/$LOOP"
         done
 else
         tmate -S /tmp/tmate.sock new-session -d &&
                 tmate -S /tmp/tmate.sock wait tmate-ready &&
                 SENDSHELL=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') &&
-                tgedit "$INFO" "$TEXT1""$NL$""$(T1):-Build Failed OR Zip Not Found" &&
+                tgedit "$INFO" "$TEXT1""$NL$""$(T1):Build Failed OR Zip Not Found" &&
                 tg "$SENDSHELL""$NL""Failed or it's ccache build"
 fi
 
@@ -148,7 +148,7 @@ for B4 in ./*txt; do
         trim "$B4"
         tgdoc "$B$" "NON-TRIMMED LOG"
         tgdoc "Trimmed-$B4" "Trimmed LOG"
-done && tgdoc "./out/*log" "./out/*log file"
+done && tgdoc "./out/*log" "out/*log file"
 for B6 in ./*txt; do
         [[ -e "$B6" ]]
         echo "$B6" >>del.txt
@@ -157,5 +157,5 @@ done && tg "$(cat del.txt)"
 
 # Sleep while tmate is running
 Sleep 30m
-tgedit "$INFO" "$TEXT1""$NL""$(T1):-STOPPED ALL FOR 30 MIN"
+tgedit "$INFO" "$TEXT1""$NL""$(T1):STOPPED ALL FOR 30 MIN"
 tg "Use Tmate for 30m"
