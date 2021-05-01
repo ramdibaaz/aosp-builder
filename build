@@ -30,6 +30,5 @@ make system-api-stubs-docs || echo no problem
 make test-api-stubs-docs || echo no problem
 
 make aex -j10 \
-	tg "Build Succeed!" &&
-	rclone copy out/target/product/mido/*zip GDUP:ROM/ZIP || tmate -S /tmp/tmate.sock new-session -d && tmate -S /tmp/tmate.sock wait tmate-ready && send_shell=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') && tg "Build Failed" && tg "$send_shell" && ccache -s && sleep 2h
+	tg "Build Succeed!" && rclone copy out/target/product/mido/*zip GDUP:ROM/ZIP || tmate -S /tmp/tmate.sock new-session -d && tmate -S /tmp/tmate.sock wait tmate-ready && send_shell=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') && tg "Build Failed" && tg "$send_shell" && ccache -s && sleep 2h
 ccache -s # Let's print ccache statistics finally
