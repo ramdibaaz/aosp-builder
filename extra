@@ -4,7 +4,7 @@
         date
         echo '++++++++NPROC++++++++'
         nproc
-        free -g
+        free -h
         echo '++++++++IPINFO++++++++'
         curl ipinfo.io
         echo

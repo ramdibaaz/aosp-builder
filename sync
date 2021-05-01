@@ -3,7 +3,7 @@
 mkdir -p /tmp/rom
 cd /tmp/rom || exit
 
-#google api code
+#google api
 echo "$apicode" >>./script1.sh && chmod +x ./script1.sh && bash ./script1.sh
 
 # Repo init
