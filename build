@@ -49,7 +49,7 @@ echo "$rclone_config" >~/.config/rclone/rclone.conf
 rm -rf ./*.txt* ./*.md*
 export ERROR_LOG1="ErrorLog.txt"
 export OUT_DIR="/tmp/rom/out/target/product/mido"
-export TZ=Asia/Kolkata
+export TZ="Asia/Kolkata"
 export NL=$'\n'
 
 # Build Info notification
@@ -99,12 +99,12 @@ sleep 60
 
 # Build %'age and kill in 85m if build type is ccache
 if [[ "$BUILD_TYPE" = "ccache" ]]; then
-        export END="$(date -ud 83 minute +%s)"
+        export END="$(date +%s -d "$(date) + 83 minute")"
 	while test ! -z "$(pidof soong_ui)"; do
 		sleep 120
 		BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
 		tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "echo $(ccache -s)"
-                if [[ "$(date -u +%s)" = "$END" ]]; then
+                if [[ "$(date +%s)" = "$END" ]]; then
                         break
                 fi
 	done
