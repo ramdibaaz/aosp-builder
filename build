@@ -1,164 +1,24 @@
 #!/bin/bash
-cd /tmp/rom || exit
+cd /tmp/rom
 
-#--------------------------EDIT FROM HERE--------------------------------
-export BOTAPI="$mybot"
-export ID="$chatid"
-export BUILD_TYPE="final" # final or ccache
-export METALAVA="true"
-export CCACHESIZE="20G"
-export LUNCHCOMMAND="lunch aosp_mido-user"
-export BUILDCOMMAND="make aex -j8"
-#--------------------------EDIT UPTO HERE--------------------------------
+# Normal build steps
+. build/envsetup.sh
+lunch aosp_mido-user
+export CCACHE_DIR=/tmp/ccache
+export CCACHE_EXEC=$(which ccache)
+export USE_CCACHE=1
+ccache -M 20G # It took only 6.4GB for mido
+ccache -o compression=true # Will save times and data to download and upload ccache, also negligible performance issue
+ccache -z # Clear old stats, so monitor script will provide real ccache statistics
 
-# Functions
-sudo apt install jq -y # jq is needed
-function tg() {
-	M_ID=$(curl -s "https://api.telegram.org/bot${BOTAPI}/sendmessage" --data "text=$1&chat_id=${ID}" | jq .result.message_id) 1>/dev/null
-}
-function tgedit() {
-	TEXT1="$2"
-	curl -s -X POST https://api.telegram.org/bot"${BOTAPI}"/editMessageText -d chat_id="$ID" -d message_id="$1" -d text="$TEXT1" -d silent=true | jq . 1>/dev/null
-}
-function tgdoc() {
-	curl -F chat_id="${ID}" -F document=@"$1" -F caption="$2" https://api.telegram.org/bot"${BOTAPI}"/sendDocument >/dev/null
-}
-function del() {
-	RESULT=$(curl -sf --data-binary @"${1:--}" https://del.dog/documents) || {
-		echo "ERROR: failed to post document" >&2
-		return 1
-	}
-	KEY=$(printf "%s\n" "${RESULT}" | cut -d '"' -f6)
-	echo "https://del.dog/${KEY}"
-}
-function com() {
-	tar --use-compress-program="pigz -k -$2 " -cf "$1".tar.gz "$1"
-}
-function T1() {
-	date +"%I:%M%p"
-}
-function trim() {
-	grep -iE 'crash|error|fail|fatal' "$1" &>"Trimmed-$1"
-}
+# Let's compile by parts! Coz of ram issue!
+make api-stubs-docs || echo no problem
+make system-api-stubs-docs || echo no problem
+make test-api-stubs-docs || echo no problem
 
-# Rclone
+make aex -j10
+
+#upload
 mkdir -p ~/.config/rclone
 echo "$rclone_config" >~/.config/rclone/rclone.conf
-
-# Env Variables
-rm -rf ./*.txt* ./*.md*
-export ERROR_LOG1="ErrorLog.txt"
-export OUT_DIR="/tmp/rom/out/target/product/mido"
-export TZ="Asia/Kolkata"
-export NL=$'\n'
-
-# Build Info notification
-tg "New Build Starts
-$(date)
-IP:$(
-	curl ipinfo.io/ip
-	echo
-) By $USER
-Type:$BUILD_TYPE Metalava:$METALAVA
-ccache:$CCACHESIZE cores:$(nproc)"
-
-# Ci stats
-wget https://raw.githubusercontent.com/ramdibaaz/aosp-builder/main/extra && chmod +x ./extra && bash extra
-tgdoc "./stats.md" "CI STATS"
-
-# Ccache
-export USE_CCACHE=1
-export CCACHE_DIR="/tmp/ccache"
-export CCACHE_EXEC=$(which ccache)
-ccache -M "$CCACHESIZE"
-ccache -o compression=true
-ccache -z
-tg "echo $(ccache -s)"
-export B2="$M_ID"
-
-# Post build Steps
-source ./build/envsetup.sh && eval "$LUNCHCOMMAND"
-tg "STAT" && export INFO="$M_ID"
-tgedit "$INFO" "$TEXT1 $(T1):Env Setup And Lunch"
-
-# Make Metalava Seperately
-if [[ "$METALAVA" = "true" ]]; then
-	tgedit "$INFO" "$TEXT1""$NL""$(T1):Metalava Build Started"
-	export WITHOUT_CHECK_API=true
-	make api-stubs-docs || echo no problem
-	make hiddenapi-lists-docs || echo no problem
-	make system-api-stubs-docs || echo no problem
-	make test-api-stubs-docs || echo no problem
-	tgedit "$INFO" "$TEXT1""$NL""$(T1):Metalava Build Done"
-fi
-
-# Final Build Start's Here
-tg "MAIN BUILD STARTED" && export B3="$M_ID"
-eval "$BUILDCOMMAND" | tee "${ERROR_LOG1}" &
-sleep 60
-
-# Build %'age and kill in 85m if build type is ccache
-if [[ "$BUILD_TYPE" = "ccache" ]]; then
-        export END="$(date +%s -d "$(date) + 83 minute")"
-	while test ! -z "$(pidof soong_ui)"; do
-		sleep 120
-		BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
-		tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "echo $(ccache -s)"
-                if [[ "$(date +%s)" = "$END" ]]; then
-                        break
-                fi
-	done
-	kill %1
-	tgedit "$INFO" "$TEXT1""$NL""$(T1):Killed FOR CCACHE UPLOAD"
-else
-	while test ! -z "$(pidof soong_ui)"; do
-		sleep 120
-		BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
-		tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "echo $(ccache -s)"
-	done
-fi
-
-# Send logs
-for B4 in *txt; do
-	[[ -e "$B4" ]]
-	trim "$B4"
-	tgdoc "$B4" "Non-trimmed LOG"
-	tgdoc "Trimmed-$B4" "Trimmed LOG"
-done && tgdoc "./out/*log" "out/*log"
-for B6 in *txt; do
-	[[ -e "$B6" ]]
-	echo "$B6" >>del.txt
-	del "$B6" >>del.txt
-done && tg "$(cat del.txt)"
-
-# Upload Rom If Zip Found
-if ls "$OUT_DIR"/*zip 1>/dev/null 2>&1; then
-	tg "Build Succeed!"
-	for LOOP in "$OUT_DIR"/*zip; do
-		[[ -e "$LOOP" ]]
-		rclone copy "$LOOP" GDUP:ROM/ZIP
-		tgedit "$INFO" "$TEXT1""$NL""$(T1):Rom Uploaded"
-		tg "ROM URL:- https://rom.jrchintu.ga/0:/ZIP/$LOOP"
-	done &
-else
-	tmate -S /tmp/tmate.sock new-session -d &&
-		tmate -S /tmp/tmate.sock wait tmate-ready &&
-		SENDSHELL=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') &&
-		tgedit "$INFO" "$TEXT1""$NL$""$(T1):Build Failed OR Zip Not Found" &&
-		tg "$SENDSHELL""$NL""Failed or it's ccache build"
-fi
-
-# Upload ccache First
-if [[ "$BUILD_TYPE" = "ccache" ]]; then
-	cd /tmp || exit
-	tgedit "$INFO" "$TEXT1""$NL""$(T1):Uploading ccache"
-	com ccache 1
-	rclone copy ccache.tar.gz GDUP:ROM/CCACHE
-	tgedit "$INFO" "$TEXT1""$NL""$(T1):Ccache Uploaded"
-	cd /tmp/rom || exit
-fi
-
-# Sleep while tmate is running
-sleep 30m
-tgedit "$INFO" "$TEXT1""$NL""$(T1):STOPPED ALL FOR 30 MIN"
-tg "Use Tmate for 30m"
+time rclone copy out/target/product/mido/*zip GDUP:ROM/ZIP -P
