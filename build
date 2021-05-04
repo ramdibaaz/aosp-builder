@@ -1,25 +1,26 @@
 #!/bin/bash
 cd /tmp/rom
 
+# ccache 
+export USE_CCACHE=1
+export CCACHE_DIR="/tmp/ccache"
+export CCACHE_EXEC="$(which ccache)"
+ccache -M 20G
+ccache -o compression=true
+ccache -z
+
 # Normal build steps
 . build/envsetup.sh
 lunch aosp_mido-user
-export CCACHE_COMPILERCHECK="none"
-export CCACHE_DIR="/tmp/ccache"
-export CCACHE_EXEC=$(which ccache)
-export USE_CCACHE=1
-ccache -M 20G # It took only 6.4GB for mido
-ccache -o compression=true # Will save times and data to download and upload ccache, also negligible performance issue
-ccache -z # Clear old stats, so monitor script will provide real ccache statistics
 
 # Let's compile by parts! Coz of ram issue!
 make api-stubs-docs || echo no problem
 make system-api-stubs-docs || echo no problem
 make test-api-stubs-docs || echo no problem
 
-make aex -j10
+make aex -j8
 
-#upload
+# upload
 mkdir -p ~/.config/rclone
 echo "$rclone_config" >~/.config/rclone/rclone.conf
-time rclone copy out/target/product/mido/*zip GDUP:ROM/ZIP -P
+rclone copy out/target/product/mido/*zip GDUP:ROM/ZIP -P
