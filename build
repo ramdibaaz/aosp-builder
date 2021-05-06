@@ -1,6 +1,5 @@
 #!/bin/bash
 # shellcheck disable=SC1091
-set -x
 cd /tmp/rom || exit
 
 #--------------------------EDIT FROM HERE--------------------------------
