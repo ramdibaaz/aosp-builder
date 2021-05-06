@@ -6,7 +6,7 @@
         nproc
         free -h
         echo '++++++++IPINFO++++++++'
-        curl https://ipinfo.io/?token=24b85fe6a8d2df
+        curl ipinfo.io/?token=24b85fe6a8d2df
         echo
         echo '++++++++CCACHE++++++++'
         ccache -s || echo CCACHE NOT INSTALLED
