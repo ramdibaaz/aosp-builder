@@ -41,7 +41,7 @@ function T1() {
     date +"%I:%M%p"
 }
 function trim() {
-    grep -iE 'crash|error|fail|fatal|failed|avc|missing|not found' "$1" &>"Trimmed-$1"
+    grep -iE 'crash|error|fail|fatal|failed|avc|missing|not found' "$1" &>"Trim-$1"
 }
 
 # Rclone
@@ -127,7 +127,7 @@ for B4 in *txt; do
     if [ -e "$B4" ]; then
         trim "$B4"
         tgdoc "$B4" "Non-trimmed LOG"
-        tgdoc "Trimmed-$B4" "Trimmed LOG"
+        tgdoc "Trim-$B4" "Trimmed LOG"
     else
         break
     fi
