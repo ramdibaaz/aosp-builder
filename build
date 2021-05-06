@@ -1,7 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC1091
 set -x
-set -e
 cd /tmp/rom || exit
 
 #--------------------------EDIT FROM HERE--------------------------------
@@ -65,7 +64,7 @@ Type:$BUILD_TYPE Metalava:$METALAVA
 ccache:$CCACHESIZE cores:$(nproc)"
 
 # Ci stats
-wget https://raw.githubusercontent.com/ramdibaaz/aosp-builder/main/extra.sh && chmod a+x ./extra.sh && bash extra.sh
+curl https://raw.githubusercontent.com/ramdibaaz/aosp-builder/main/extra.sh >>extra.sh && chmod +x ./extra.sh && bash extra.sh
 tgdoc "stats.md" "CI STATS"
 
 # Ccache
