@@ -144,7 +144,6 @@ tg "$(cat del.txt)"
 
 # Upload Rom If Zip Found
 if ls /tmp/rom/out/target/product/mido/*zip 1>/dev/null 2>&1; then
-    tg "Build Succeed!"
     for LOOP in /tmp/rom/out/target/product/mido/*zip; do
         if [ -e "$LOOP" ]; then
             rclone copy "$LOOP" GDUP:ROM/ZIP
