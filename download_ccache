@@ -1,10 +1,10 @@
 #!/bin/bash
-export URL="https://rom.jrchintu.ga/0:/CCACHE/CCACHEBACKUP/ccache.tar.gz"
 
 # Lets see machine specifications and environments
 df -h && free -g && nproc && cat /etc/os*
 
-cd /tmp || exit              # Where to download cccahe
-time aria2c "$URL" -x16 -s50 # ccache will be at /tmp/ccache.tar.gz since my file name is ccache.tar.gz
-time tar xf ccache.tar.gz    # extract ccache
-rm -rf ccache.tar.gz
+#export URL="https://rom.jrchintu.ga/0:/CCACHE/CCACHEBACKUP/ccache.tar.gz"
+#cd /tmp || exit
+#time aria2c "$URL" -x16 -s50
+#time tar xf ccache.tar.gz
+#rm -rf ccache.tar.gz
