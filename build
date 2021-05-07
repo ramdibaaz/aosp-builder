@@ -5,11 +5,11 @@ cd /tmp/rom || exit
 #--------------------------EDIT FROM HERE--------------------------------
 export BOTAPI="$mybot"
 export ID="$chatid"
-export BUILD_TYPE="final" # final or ccache
+export BUILD_TYPE="ccache" # final or ccache
 export METALAVA="true"
 export CCACHESIZE="20G"
-export LUNCHCOMMAND="lunch aosp_mido-user"
-export BUILDCOMMAND="make aex -j8"
+export LUNCHCOMMAND="lunch potato_mido-user"
+export BUILDCOMMAND="mka potato -j8"
 #--------------------------EDIT UPTO HERE--------------------------------
 
 # Functions And imp stuff
@@ -86,10 +86,10 @@ tgedit "$INFO" "$TEXT1 $(T1):Env Setup And Lunch"
 if [[ "$METALAVA" = "true" ]]; then
     tgedit "$INFO" "$TEXT1""$NL""$(T1):Metalava Build Started"
     export WITHOUT_CHECK_API=true
-    make api-stubs-docs || echo SKIPPING
-    make hiddenapi-lists-docs || echo SKIPPING
-    make system-api-stubs-docs || echo SKIPPING
-    make test-api-stubs-docs || echo SKIPPING
+    mka api-stubs-docs || echo SKIPPING
+    mka hiddenapi-lists-docs || echo SKIPPING
+    mka system-api-stubs-docs || echo SKIPPING
+    mka test-api-stubs-docs || echo SKIPPING
     tgedit "$INFO" "$TEXT1""$NL""$(T1):Metalava Build Done"
 fi
 
