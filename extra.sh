@@ -2,13 +2,14 @@
 
 {
         date
-                
+        if  [[ -z "${CIRRUS_TASK_ID}"] ]; then
         echo '++++++++++LOGS+++++++++++'
         echo https://api.cirrus-ci.com/v1/task/"$CIRRUS_TASK_ID"/logs/clone.log
         echo https://api.cirrus-ci.com/v1/task/"$CIRRUS_TASK_ID"/logs/download_ccache.log
         echo https://api.cirrus-ci.com/v1/task/"$CIRRUS_TASK_ID"/logs/sync.log
         echo https://api.cirrus-ci.com/v1/task/"$CIRRUS_TASK_ID"/logs/monitor.log
         echo https://api.cirrus-ci.com/v1/task/"$CIRRUS_TASK_ID"/logs/build.log
+        fi
         
         echo '++++++++NPROC++++++++'
         nproc
