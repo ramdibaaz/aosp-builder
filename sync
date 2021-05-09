@@ -10,7 +10,7 @@ echo "$apicode" >>./script1.sh && chmod +x ./script1.sh && bash ./script1.sh
 repo init -q --no-repo-verify --depth=1 -u git://github.com/PotatoProject/manifest.git -b dumaloo-release -g default,-device,-mips,-darwin,-notdefault
 
 # Local Manifest
-git clone https://github.com/jrchintu/android_.repo_local_manifests.git --depth 1 -b posp .repo/local_manifests
+git clone https://github.com/jrchintu/local_manifest.git --depth 1 -b posp .repo/local_manifests
 
 # Sync source
 repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j 30 ||
