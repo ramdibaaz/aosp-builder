@@ -9,7 +9,7 @@ export BUILD_TYPE="ccache" # final or ccache
 export METALAVA="true"
 export CCACHESIZE="20G"
 export LUNCHCOMMAND="lunch potato_mido-user"
-export BUILDCOMMAND="mka potato -j8"
+export BUILDCOMMAND="brunch mido -j8"
 #--------------------------EDIT UPTO HERE--------------------------------
 
 # Functions And imp stuff
