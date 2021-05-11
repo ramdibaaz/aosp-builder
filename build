@@ -39,7 +39,7 @@ function T1() {
     date +"%I:%M%p"
 }
 function trim() {
-    grep -iE 'crash|error|fail|fatal|failed|avc|missing|not found' "$1" &>"Trim-$1"
+    grep -iE 'crash|error|fail|fatal|failed|missing' "$1" &>"Trim-$1"
 }
 
 # Rclone
@@ -63,7 +63,7 @@ export CCACHE_EXEC="$(which ccache)"
 export CCACHE_COMPILERCHECK="none"
 ccache -M "$CCACHESIZE"
 ccache -o compression=true
-tg "echo $(ccache -s)"
+tg "$(ccache -s)"
 export B2="$M_ID"
 
 # Build Info notification
@@ -80,8 +80,6 @@ export INFO="$M_ID"
 # Before build Steps
 source ./build/envsetup.sh && eval "$LUNCHCOMMAND"
 tgedit "$INFO" "$TEXT1""$NL""$(T1):Env Setup And Lunch"
-
-#extra 
 export SELINUX_IGNORE_NEVERALLOWS=true
 
 # Make Metalava Seperately
@@ -126,23 +124,13 @@ fi
 for B4 in *txt; do
     if [ -e "$B4" ]; then
         trim "$B4"
-        tgdoc "$B4" "Non-trimmed LOG"
-        tgdoc "Trim-$B4" "Trimmed LOG"
+        tgdoc "$B4" "$(del $B6)"
+        tgdoc "Trim-$B4" "$(del Trim-$B6)"
     else
         break
     fi
 done
 tgdoc "./out/*log" "out/*log"
-
-for B6 in *txt; do
-    if [ -e "$B6" ]; then
-        echo "$B6" >>del.txt
-        del "$B6" >>del.txt
-    else
-        break
-    fi
-done
-tg "$(cat del.txt)"
 
 # Upload Rom If Zip Found
 if ls /tmp/rom/out/target/product/mido/*zip 1>/dev/null 2>&1; then
