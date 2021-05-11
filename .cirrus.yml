@@ -14,5 +14,6 @@ task:
       image: apon77/aosp:latest
       cpu: 1
       memory: 1G
-    build_script
+    build_script:
       - ./main
+        
