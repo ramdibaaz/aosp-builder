@@ -124,8 +124,8 @@ fi
 for B4 in *txt; do
     if [ -e "$B4" ]; then
         trim "$B4"
-        tgdoc "$B4" "$(del $B6)"
-        tgdoc "Trim-$B4" "$(del Trim-$B6)"
+        tgdoc "$B4" "$(del "$B6")"
+        tgdoc "Trim-$B4" "$(del Trim-"$B6")"
     else
         break
     fi
