@@ -99,7 +99,7 @@ fi
 tg "BUILD%" && export B3="$M_ID"
 eval "$BUILDCOMMAND" | tee "${ERROR_LOG1}" &
 sleep 60
-export END="$(date +%T -d "$(date) + 83 minute")"
+export END="$(date +"%I:%M%p" -d "$(date) + 83 minute")"
 tgedit "$INFO" "$TEXT1""$NL""$(T1):Main Build upto $END"
 
 # Build %'age and kill in 85m if build type is ccache
@@ -108,7 +108,7 @@ if [[ "$BUILD_TYPE" = "ccache" ]]; then
         sleep 120
         BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
         tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "echo $(ccache -s)"
-        if [[ "$(date +%T)" = "$END" ]]; then
+        if [[ "$(date +"%I:%M%p")" = "$END" ]]; then
             break
         fi
     done
