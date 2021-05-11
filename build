@@ -52,19 +52,9 @@ export ERROR_LOG1="ErrorLog.txt"
 export TZ="Asia/Kolkata"
 export NL=$'\n'
 
-# Build Info notification
-tg "New Build Starts 
-$(date)
-IP:$(
-    curl ipinfo.io/ip
-    echo
-) By $USER
-Type:$BUILD_TYPE Metalava:$METALAVA
-ccache:$CCACHESIZE cores:$(nproc)"
-
 # Ci stats
 curl https://raw.githubusercontent.com/ramdibaaz/aosp-builder/main/extra.sh >>extra.sh && chmod +x ./extra.sh && bash extra.sh
-tgdoc "stats.md" "CI STATS"
+tgdoc "stats.md" "New build starts"
 
 # Ccache
 export USE_CCACHE=1
@@ -73,14 +63,23 @@ export CCACHE_EXEC="$(which ccache)"
 export CCACHE_COMPILERCHECK="none"
 ccache -M "$CCACHESIZE"
 ccache -o compression=true
-ccache -z
 tg "echo $(ccache -s)"
 export B2="$M_ID"
 
+# Build Info notification
+tg "$(date)
+IP:$(
+    curl ipinfo.io/ip
+    echo
+) By $USER
+Type:$BUILD_TYPE Metalava:$METALAVA
+ccache:$CCACHESIZE cores:$(nproc)
++++++++++++++++++++++"
+export INFO="$M_ID"
+
 # Before build Steps
 source ./build/envsetup.sh && eval "$LUNCHCOMMAND"
-tg "STAT" && export INFO="$M_ID"
-tgedit "$INFO" "$TEXT1 $(T1):Env Setup And Lunch"
+tgedit "$INFO" "$TEXT1""$NL""$(T1):Env Setup And Lunch"
 
 # Make Metalava Seperately
 if [[ "$METALAVA" = "true" ]]; then
@@ -94,14 +93,14 @@ if [[ "$METALAVA" = "true" ]]; then
 fi
 
 # Final Build Start's Here
-tgedit "$INFO" "$TEXT1""$NL""$(T1):Main Build Started"
 tg "BUILD%" && export B3="$M_ID"
 eval "$BUILDCOMMAND" | tee "${ERROR_LOG1}" &
 sleep 60
+export END="$(date +%T -d "$(date) + 83 minute")"
+tgedit "$INFO" "$TEXT1""$NL""$(T1):Main Build upto $END"
 
 # Build %'age and kill in 85m if build type is ccache
 if [[ "$BUILD_TYPE" = "ccache" ]]; then
-    export END="$(date +%T -d "$(date) + 83 minute")"
     while test ! -z "$(pidof soong_ui)"; do
         sleep 120
         BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
@@ -157,11 +156,11 @@ else
     tmate -S /tmp/tmate.sock new-session -d &&
         tmate -S /tmp/tmate.sock wait tmate-ready &&
         SENDSHELL=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') &&
-        tgedit "$INFO" "$TEXT1""$NL$""$(T1):Build Failed OR Zip Not Found" &&
+        tgedit "$INFO" "$TEXT1""$NL""$(T1):Build Failed OR Zip Not Found" &&
         tg "$SENDSHELL""$NL""Failed or it's ccache build"
 fi
 
-# Upload ccache First
+# Upload ccache
 if [[ "$BUILD_TYPE" = "ccache" ]]; then
     cd /tmp || exit
     tgedit "$INFO" "$TEXT1""$NL""$(T1):Uploading ccache"
