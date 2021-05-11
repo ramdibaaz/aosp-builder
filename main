@@ -11,9 +11,6 @@ function tgedit() {
     TEXT1="$2"
     curl -s -X POST https://api.telegram.org/bot"${BOTAPI}"/editMessageText -d chat_id="$ID" -d message_id="$1" -d text="$TEXT1" -d silent=true | jq . 1>/dev/null
 }
-function T1() {
-    date +"%I:%M%p"
-}
 
 #variables
 export BOTAPI="$mybot"
@@ -28,7 +25,7 @@ GITUSER="$(git log -1 --pretty=format:'%an')"
 cd - || exit
 
 # Check if build triggred
-tg "New Task By $(echo $GITUSER)""$NL""Branch=$CIRRUS_BRANCH""$NL""Rom::$ROM_NAME""$NL""From::$FROM""$NL""To::$END"
+tg "New Task By $(echo $GITUSER)""$NL""Branch=$CIRRUS_BRANCH""$NL""Rom=$ROM_NAME""$NL""From=$FROM""$NL""To=$END"
 
 echo sucessfull
 echo exiting now
