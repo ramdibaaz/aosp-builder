@@ -8,8 +8,8 @@ export ID="$chatid"
 export BUILD_TYPE="ccache" # final or ccache
 export METALAVA="true"
 export CCACHESIZE="20G"
-export LUNCHCOMMAND="lunch potato_mido-user"
-export BUILDCOMMAND="brunch mido -j8"
+export LUNCHCOMMAND="lunch corvus_device-userdebug"
+export BUILDCOMMAND="make corvus"
 #--------------------------EDIT UPTO HERE--------------------------------
 
 # Functions And imp stuff
