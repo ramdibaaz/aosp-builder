@@ -8,7 +8,7 @@ export ID="$chatid"
 export BUILD_TYPE="ccache" # final or ccache
 export METALAVA="true"
 export CCACHESIZE="20G"
-export LUNCHCOMMAND="lunch corvus_device-userdebug"
+export LUNCHCOMMAND="lunch corvus_mido-userdebug"
 export BUILDCOMMAND="make corvus"
 #--------------------------EDIT UPTO HERE--------------------------------
 
@@ -80,6 +80,9 @@ export INFO="$M_ID"
 # Before build Steps
 source ./build/envsetup.sh && eval "$LUNCHCOMMAND"
 tgedit "$INFO" "$TEXT1""$NL""$(T1):Env Setup And Lunch"
+
+#extra 
+export SELINUX_IGNORE_NEVERALLOWS=true
 
 # Make Metalava Seperately
 if [[ "$METALAVA" = "true" ]]; then
