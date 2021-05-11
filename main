@@ -19,7 +19,8 @@ function T1() {
 export BOTAPI="$mybot"
 export ID="$chatid"
 export NL=$'\n'
-export END="$(date +%T -d "$(date) + 240 minute")"
+export END="$(date +"%I:%M%p" -d "$(date) + 240 minute")"
+export FROM="$(date +"%I:%M%p")"
 
 #get user name
 cd "$CIRRUS_WORKING_DIR" || exit
@@ -27,7 +28,7 @@ GITUSER="$(git log -1 --pretty=format:'%an')"
 cd - || exit
 
 # Check if build triggred
-tg "New Task By $(echo $GITUSER)""$NL""Branch=$CIRRUS_BRANCH""$NL""Rom::$ROM_NAME""$NL""From::$T1""$NL""To::$END"
+tg "New Task By $(echo $GITUSER)""$NL""Branch=$CIRRUS_BRANCH""$NL""Rom::$ROM_NAME""$NL""From::$FROM""$NL""To::$END"
 
 echo sucessfull
 echo exiting now
