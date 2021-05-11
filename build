@@ -15,6 +15,7 @@ export BUILDCOMMAND="make corvus"
 # Functions And imp stuff
 sudo apt install jq -y
 function tg() {
+    TEXT2="$1"
     M_ID=$(curl -s "https://api.telegram.org/bot${BOTAPI}/sendmessage" --data "text=$1&chat_id=${ID}" | jq .result.message_id) 1>/dev/null
 }
 function tgedit() {
@@ -72,7 +73,7 @@ export INFO="$M_ID"
 
 # Before build Steps
 source ./build/envsetup.sh && eval "$LUNCHCOMMAND"
-tgedit "$INFO" "$TEXT1""$NL""$(T1):Env Setup And Lunch"
+tgedit "$INFO" "$TEXT2""$NL""$(T1):Env Setup And Lunch"
 export SELINUX_IGNORE_NEVERALLOWS=true
 
 # Make Metalava Seperately
