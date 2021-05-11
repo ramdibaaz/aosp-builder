@@ -3,8 +3,8 @@
 # Lets see machine specifications and environments
 df -h && free -g && nproc && cat /etc/os*
 
-#export URL="https://rom.jrchintu.ga/0:/CCACHE/CCACHEBACKUP/ccache.tar.gz"
-#cd /tmp || exit
-#time aria2c "$URL" -x16 -s50
-#time tar xf ccache.tar.gz
-#rm -rf ccache.tar.gz
+export URL="https://rom.jrchintu.ga/0:/CCACHE/ccache.tar.gz"
+cd /tmp || exit
+time aria2c "$URL" -x16 -s50
+time tar xf ccache.tar.gz
+rm -rf ccache.tar.gz
