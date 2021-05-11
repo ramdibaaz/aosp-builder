@@ -80,10 +80,10 @@ export SELINUX_IGNORE_NEVERALLOWS=true
 if [[ "$METALAVA" = "true" ]]; then
     tgedit "$INFO" "$TEXT2""$NL""$(T1):Metalava Build Started"
     export WITHOUT_CHECK_API=true
-    mka api-stubs-docs || echo SKIPPING
-    mka hiddenapi-lists-docs || echo SKIPPING
-    mka system-api-stubs-docs || echo SKIPPING
-    mka test-api-stubs-docs || echo SKIPPING
+    make api-stubs-docs || echo SKIPPING
+    make system-api-stubs-docs || echo SKIPPING
+    make test-api-stubs-docs || echo SKIPPING
+    make hiddenapi-lists-docs || echo SKIPPING
     tgedit "$INFO" "$TEXT2""$NL""$(T1):Metalava Build Done"
 fi
 
@@ -99,7 +99,7 @@ if [[ "$BUILD_TYPE" = "ccache" ]]; then
     while test ! -z "$(pidof soong_ui)"; do
         sleep 120
         BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
-        tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "echo $(ccache -s)"
+        tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "$(ccache -s)"
         if [[ "$(date +"%I:%M%p")" = "$END" ]]; then
             break
         fi
@@ -110,7 +110,7 @@ else
     while test ! -z "$(pidof soong_ui)"; do
         sleep 120
         BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
-        tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "echo $(ccache -s)"
+        tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "$(ccache -s)"
     done
 fi
 
@@ -118,8 +118,8 @@ fi
 for B4 in *txt; do
     if [ -e "$B4" ]; then
         trim "$B4"
-        tgdoc "$B4" "$(del "$B6")"
-        tgdoc "Trim-$B4" "$(del Trim-"$B6")"
+        tgdoc "$B4" "$(del "$B4")"
+        tgdoc "Trim-$B4" "$(del Trim-"$B4")"
     else
         break
     fi
