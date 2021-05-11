@@ -15,12 +15,12 @@ export BUILDCOMMAND="make corvus"
 # Functions And imp stuff
 sudo apt install jq -y
 function tg() {
-    TEXT2="$1"
+    TEXT1="$1"
     M_ID=$(curl -s "https://api.telegram.org/bot${BOTAPI}/sendmessage" --data "text=$1&chat_id=${ID}" | jq .result.message_id) 1>/dev/null
 }
 function tgedit() {
-    TEXT1="$2"
-    curl -s -X POST https://api.telegram.org/bot"${BOTAPI}"/editMessageText -d chat_id="$ID" -d message_id="$1" -d text="$TEXT1" -d silent=true | jq . 1>/dev/null
+    TEXT2="$2"
+    curl -s -X POST https://api.telegram.org/bot"${BOTAPI}"/editMessageText -d chat_id="$ID" -d message_id="$1" -d text="$TEXT2" -d silent=true | jq . 1>/dev/null
 }
 function tgdoc() {
     curl -F chat_id="${ID}" -F document=@"$1" -F caption="$2" https://api.telegram.org/bot"${BOTAPI}"/sendDocument >/dev/null
@@ -73,18 +73,18 @@ export INFO="$M_ID"
 
 # Before build Steps
 source ./build/envsetup.sh && eval "$LUNCHCOMMAND"
-tgedit "$INFO" "$TEXT2""$NL""$(T1):Env Setup And Lunch"
+tgedit "$INFO" "$TEXT1""$NL""$(T1):Env Setup And Lunch"
 export SELINUX_IGNORE_NEVERALLOWS=true
 
 # Make Metalava Seperately
 if [[ "$METALAVA" = "true" ]]; then
-    tgedit "$INFO" "$TEXT1""$NL""$(T1):Metalava Build Started"
+    tgedit "$INFO" "$TEXT2""$NL""$(T1):Metalava Build Started"
     export WITHOUT_CHECK_API=true
     mka api-stubs-docs || echo SKIPPING
     mka hiddenapi-lists-docs || echo SKIPPING
     mka system-api-stubs-docs || echo SKIPPING
     mka test-api-stubs-docs || echo SKIPPING
-    tgedit "$INFO" "$TEXT1""$NL""$(T1):Metalava Build Done"
+    tgedit "$INFO" "$TEXT2""$NL""$(T1):Metalava Build Done"
 fi
 
 # Final Build Start's Here
@@ -92,7 +92,7 @@ tg "BUILD%" && export B3="$M_ID"
 eval "$BUILDCOMMAND" | tee "${ERROR_LOG1}" &
 sleep 60
 export END="$(date +"%I:%M%p" -d "$(date) + 83 minute")"
-tgedit "$INFO" "$TEXT1""$NL""$(T1):Main Build upto $END"
+tgedit "$INFO" "$TEXT2""$NL""$(T1):Main Build upto $END"
 
 # Build %'age and kill in 85m if build type is ccache
 if [[ "$BUILD_TYPE" = "ccache" ]]; then
@@ -105,7 +105,7 @@ if [[ "$BUILD_TYPE" = "ccache" ]]; then
         fi
     done
     kill %1
-    tgedit "$INFO" "$TEXT1""$NL""$(T1):Killed FOR CCACHE UPLOAD"
+    tgedit "$INFO" "$TEXT2""$NL""$(T1):Killed FOR CCACHE UPLOAD"
 else
     while test ! -z "$(pidof soong_ui)"; do
         sleep 120
@@ -131,7 +131,7 @@ if ls /tmp/rom/out/target/product/mido/*zip 1>/dev/null 2>&1; then
     for LOOP in /tmp/rom/out/target/product/mido/*zip; do
         if [ -e "$LOOP" ]; then
             rclone copy "$LOOP" GDUP:ROM/ZIP
-            tgedit "$INFO" "$TEXT1""$NL""$(T1):Rom Uploaded"
+            tgedit "$INFO" "$TEXT2""$NL""$(T1):Rom Uploaded"
             tg "ROM URL:-https://rom.jrchintu.ga/0:/ZIP/$LOOP"
         else
             break
@@ -141,20 +141,20 @@ else
     tmate -S /tmp/tmate.sock new-session -d &&
         tmate -S /tmp/tmate.sock wait tmate-ready &&
         SENDSHELL=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') &&
-        tgedit "$INFO" "$TEXT1""$NL""$(T1):Build Failed OR Zip Not Found" &&
+        tgedit "$INFO" "$TEXT2""$NL""$(T1):Build Failed OR Zip Not Found" &&
         tg "$SENDSHELL""$NL""Failed or it's ccache build""$NL""Use Tmate for 30min"
 fi
 
 # Upload ccache
 if [[ "$BUILD_TYPE" = "ccache" ]]; then
     cd /tmp || exit
-    tgedit "$INFO" "$TEXT1""$NL""$(T1):Uploading ccache"
+    tgedit "$INFO" "$TEXT2""$NL""$(T1):Uploading ccache"
     com ccache 1
     rclone copy ccache.tar.gz GDUP:ROM/CCACHE
-    tgedit "$INFO" "$TEXT1""$NL""$(T1):Ccache Uploaded"
+    tgedit "$INFO" "$TEXT2""$NL""$(T1):Ccache Uploaded"
     cd /tmp/rom || exit
 fi
 
 # Sleep while tmate is running
-tgedit "$INFO" "$TEXT1""$NL""$(T1):STOPPED ALL FOR 30 MIN"
+tgedit "$INFO" "$TEXT2""$NL""$(T1):STOPPED ALL FOR 30 MIN"
 sleep 30m
