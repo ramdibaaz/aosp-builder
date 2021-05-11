@@ -27,7 +27,7 @@ GITUSER="$(git log -1 --pretty=format:'%an')"
 cd - || exit
 
 # Check if build triggred
-tg "New Task By $(echo $GITUSER)""$NL""Branch=$CIRRUS_BRANCH""$NL""Rom::$ROM_NAME""$NL""From::$TI""$NL""To::$END"
+tg "New Task By $(echo $GITUSER)""$NL""Branch=$CIRRUS_BRANCH""$NL""Rom::$ROM_NAME""$NL""From::$T1""$NL""To::$END"
 
 echo sucessfull
 echo exiting now
