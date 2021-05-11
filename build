@@ -157,4 +157,4 @@ fi
 
 # Sleep while tmate is running
 tgedit "$INFO" "$TEXT2""$NL""$(T1):STOPPED ALL FOR 30 MIN"
-sleep 30m
+sleep 120m
