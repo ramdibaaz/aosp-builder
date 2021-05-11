@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#Install imp stuff
+sudo apt install jq -y
+
+# fuctions
+function tg() {
+    M_ID=$(curl -s "https://api.telegram.org/bot${BOTAPI}/sendmessage" --data "text=$1&chat_id=${ID}" | jq .result.message_id) 1>/dev/null
+}
+function tgedit() {
+    TEXT1="$2"
+    curl -s -X POST https://api.telegram.org/bot"${BOTAPI}"/editMessageText -d chat_id="$ID" -d message_id="$1" -d text="$TEXT1" -d silent=true | jq . 1>/dev/null
+}
+function T1() {
+    date +"%I:%M%p"
+}
+
+#variables
+export BOTAPI="$mybot"
+export ID="$chatid"
+export NL=$'\n'
+export END="$(date +%T -d "$(date) + 240 minute")"
+
+#get user name
+cd "$CIRRUS_WORKING_DIR" || exit
+GITUSER="$(git log -1 --pretty=format:'%an')"
+cd - || exit
+
+# Check if build triggred
+tg "New Task By $(echo $GITUSER)""$NL""Branch=$CIRRUS_BRANCH""$NL""Rom::$ROM_NAME""$NL""From::$TI""$NL""To::$END"
+
+echo sucessfull
+echo exiting now

@@ -4,23 +4,15 @@ env: # Environt variable to pass to all tasks
 
     # For rclone with google drive or any cloud! After first commit pushing, login to https://cirrus-ci.com , click top left corner 3 dot menu, click repository(yourname/aosp-builder) > Repository Settings > Secured Variables > enter content of ~/.config/rclone/rclone.conf (from pc where you setup rclone) > ENCRYPT, copy that ENCRYPTED hash
     # ENCRYPTED variables is unique for every repository, so you cant use my one, create you rclone config https://rclone.org/drive/#making-your-own-client-id
-    rclone_config: "ENCRYPTED[b9b6550ae3c9ad09a5a3a7c3973b63aede81db377dd20638adfd4653ce4f6f6937a8d6a1c9c46a159555cfa5de9a328a]"
     mybot: "ENCRYPTED[4ea5ccbe099dbc871b69471a44b01bfe303aa800316a47cd8d1d8a9ac39983602e86240a11176079b57c8de45f3f2ff2]"
     chatid: "ENCRYPTED[56e1549bbe0b45cd3c02228ff83508dfb388ed2f2ee37349836964330190a4cbae437b7a74ca53aa5520cba19b7fec0c]"
-    apicode: "ENCRYPTED[b38021c1c48f8177d79bb061c2f87ff66d2d76a71d52e4cd075fa8117aada0e6a13a7805827fb38cb17934973a539af5]"
-
+    
 task:
-    name: aosp # Project name
-    timeout_in: 120m # Otherwise it will timeout at 60m automatically, 120m highest in free account
+    name: test
+    timeout_in: 15m
     container:
-      image: apon77/aosp:latest # It has built in setup environment + repo, aria2, rclone, pigz, username ci, and email ci@ci.ci [You can use your own docker image if you want, or you can use this one too!]
-      cpu: 8  #8 cpu for dummy build, 10 or more cpu for final build, sometimes more than 8 cpu will cause a timelock, so you wont be able to run ci again within few hours, in build script use -j8 or -j10 depending what you used here, otherwise low memory issue will happen, 16cpu highest
-      memory: 24G # So that we can have ram when needed, 24G highest
-    download_ccache_background_script: # To download ccache in background
-      - ./download_ccache # Ccache download script
-    sync_script: # To sync source
-      - ./sync # Source sync script
-    monitor_background_script: # To monitor ccache and machine status every minute, runs in background
-      - ./monitor # Monitor script
-    build_script: # Actual build script foreground
-      - ./build # Build script to run
+      image: apon77/aosp:latest
+      cpu: 1
+      memory: 1G
+    build_script
+      - ./main
