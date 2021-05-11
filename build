@@ -142,7 +142,7 @@ else
         tmate -S /tmp/tmate.sock wait tmate-ready &&
         SENDSHELL=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') &&
         tgedit "$INFO" "$TEXT2""$NL""$(T1):Build Failed OR Zip Not Found" &&
-        tg "$SENDSHELL""$NL""Failed or it's ccache build""$NL""Use Tmate for 30min"
+        tg "$SENDSHELL"
 fi
 
 # Upload ccache
@@ -156,5 +156,5 @@ if [[ "$BUILD_TYPE" = "ccache" ]]; then
 fi
 
 # Sleep while tmate is running
-tgedit "$INFO" "$TEXT2""$NL""$(T1):STOPPED ALL FOR 30 MIN"
+tgedit "$INFO" "$TEXT2""$NL""$(T1):STOPPED ALL UPTO $END"
 sleep 120m
