@@ -67,14 +67,7 @@ tg "$(ccache -s)"
 export B2="$M_ID"
 
 # Build Info notification
-tg "$(date)
-IP:$(
-    curl ipinfo.io/ip
-    echo
-) By $USER
-Type:$BUILD_TYPE Metalava:$METALAVA
-ccache:$CCACHESIZE cores:$(nproc)
-+++++++++++++++++++++"
+tg "$(date)""$NL""IP:$(curl ipinfo.io/ip) By $USER""$NL""Type:$BUILD_TYPE Metalava:$METALAVA""$NL""ccache:$CCACHESIZE cores:$(nproc)""$NL""+++++++++++++++++++++"
 export INFO="$M_ID"
 
 # Before build Steps
