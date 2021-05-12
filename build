@@ -97,12 +97,12 @@ tgedit "$INFO" "$TEXT2""$NL""$(T1):Main Build upto $END"
 # Build %'age and kill in 85m if build type is ccache
 if [[ "$BUILD_TYPE" = "ccache" ]]; then
     while test ! -z "$(pidof soong_ui)"; do
-        sleep 120
-        BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
-        tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "$(ccache -s)"
         if [[ "$(date +"%I:%M%p")" = "$END" ]]; then
             break
         fi
+        sleep 120
+        BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
+        tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "$(ccache -s)"
     done
     kill %1
     tgedit "$INFO" "$TEXT2""$NL""$(T1):Killed FOR CCACHE UPLOAD"
@@ -124,7 +124,7 @@ for B4 in *txt; do
         break
     fi
 done
-tgdoc "./out/*log" "out/*log"
+tgdoc "./out/*log" "$(del ./out/*log)"
 
 # Upload Rom If Zip Found
 if ls /tmp/rom/out/target/product/mido/*zip 1>/dev/null 2>&1; then
