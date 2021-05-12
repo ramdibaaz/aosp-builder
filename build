@@ -155,6 +155,6 @@ if [[ "$BUILD_TYPE" = "ccache" ]]; then
     cd /tmp/rom || exit
 fi
 
-# Sleep while tmate is running
+# sleep while tmate is running
 tgedit "$INFO" "$TEXT2""$NL""$(T1):STOPPED ALL UPTO $END"
 sleep 120m
