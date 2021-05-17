@@ -8,7 +8,7 @@ export ID="$chatid"
 export BUILD_TYPE="ccache" # final or ccache
 export METALAVA="true"
 export CCACHESIZE="20G"
-export LUNCHCOMMAND="lunch corvus_mido-userdebug"
+export LUNCHCOMMAND="lunch corvus_mido-user"
 export BUILDCOMMAND="make corvus"
 #--------------------------EDIT UPTO HERE--------------------------------
 
