@@ -61,7 +61,6 @@ tgdoc "stats.md" "New build starts"
 export USE_CCACHE=1
 export CCACHE_DIR="/tmp/ccache"
 export CCACHE_EXEC="$(which ccache)"
-export CCACHE_COMPILERCHECK="none"
 ccache -M "$CCACHESIZE"
 ccache -o compression=true
 tg "$(ccache -s)"
@@ -81,9 +80,9 @@ if [[ "$METALAVA" = "true" ]]; then
     tgedit "$INFO" "$TEXT2""$NL""$(T1):Metalava Build Started"
     export WITHOUT_CHECK_API=true
     make api-stubs-docs || echo SKIPPING
+    make hiddenapi-lists-docs || echo SKIPPING
     make system-api-stubs-docs || echo SKIPPING
     make test-api-stubs-docs || echo SKIPPING
-    make hiddenapi-lists-docs || echo SKIPPING
     tgedit "$INFO" "$TEXT2""$NL""$(T1):Metalava Build Done"
 fi
 
@@ -97,12 +96,12 @@ tgedit "$INFO" "$TEXT2""$NL""$(T1):Main Build upto $END"
 # Build %'age and kill in 85m if build type is ccache
 if [[ "$BUILD_TYPE" = "ccache" ]]; then
     while test ! -z "$(pidof soong_ui)"; do
+        sleep 120
+        BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
+        tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "echo $(ccache -s)"
         if [[ "$(date +"%I:%M%p")" = "$END" ]]; then
             break
         fi
-        sleep 120
-        BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
-        tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "$(ccache -s)"
     done
     kill %1
     tgedit "$INFO" "$TEXT2""$NL""$(T1):Killed FOR CCACHE UPLOAD"
@@ -110,7 +109,7 @@ else
     while test ! -z "$(pidof soong_ui)"; do
         sleep 120
         BUILD_STATS=$(tail <"${ERROR_LOG1}" -n 1 | awk '{ print $2 }')
-        tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "$(ccache -s)"
+        tgedit "$B3" "$(T1)=$BUILD_STATS" && tgedit "$B2" "echo $(ccache -s)"
     done
 fi
 
@@ -118,13 +117,13 @@ fi
 for B4 in *txt; do
     if [ -e "$B4" ]; then
         trim "$B4"
-        tgdoc "$B4" "$(del "$B4")"
-        tgdoc "Trim-$B4" "$(del Trim-"$B4")"
+        tgdoc "$B4" "$(del "$B6")"
+        tgdoc "Trim-$B4" "$(del Trim-"$B6")"
     else
         break
     fi
 done
-tgdoc "./out/*log" "$(del ./out/*log)"
+tgdoc "./out/*log" "out/*log"
 
 # Upload Rom If Zip Found
 if ls /tmp/rom/out/target/product/mido/*zip 1>/dev/null 2>&1; then
@@ -142,7 +141,7 @@ else
         tmate -S /tmp/tmate.sock wait tmate-ready &&
         SENDSHELL=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') &&
         tgedit "$INFO" "$TEXT2""$NL""$(T1):Build Failed OR Zip Not Found" &&
-        tg "$SENDSHELL"
+        tg "$SENDSHELL""$NL""Failed or it's ccache build""$NL""Use Tmate for 30min"
 fi
 
 # Upload ccache
@@ -155,6 +154,6 @@ if [[ "$BUILD_TYPE" = "ccache" ]]; then
     cd /tmp/rom || exit
 fi
 
-# sleep while tmate is running
-tgedit "$INFO" "$TEXT2""$NL""$(T1):STOPPED ALL UPTO $END"
-sleep 120m
+# Sleep while tmate is running
+tgedit "$INFO" "$TEXT2""$NL""$(T1):STOPPED ALL FOR 30 MIN"
+sleep 30m
