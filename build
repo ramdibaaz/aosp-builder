@@ -11,9 +11,9 @@ export CCACHESIZE="20G"
 export LUNCHCOMMAND="lunch corvus_mido-user"
 export BUILDCOMMAND="make corvus"
 #--------------------------EDIT UPTO HERE--------------------------------
-sudo apt install jq -y 1>/dev/null
 
 # Functions And imp stuff
+sudo apt install jq -y 1>/dev/null
 function TG() {
     TEXT1="$1"
     M_ID=$(curl -s "https://api.telegram.org/bot${BOTAPI}/sendmessage" \
@@ -104,14 +104,15 @@ TGEDIT "$INFO" "$TEXT2""$NL""$(T1):Main Build upto $END"
 if [[ "$BUILD_TYPE" = "ccache" ]]; then
     while test ! -z "$(pidof soong_ui)"; do
         if [[ "$(date +"%I:%M%p")" = "$END" ]]; then
+            kill %1
+            TGEDIT "$INFO" "$TEXT2""$NL""$(T1):Killed FOR CCACHE UPLOAD"
             break
+        else
+            sleep 120
+            BUILD_STATS=$(tail <"ErrorLog.txt" -n 1 | awk '{ print $2 }')
+            TGEDIT "$B3" "$(T1)=$BUILD_STATS" && TGEDIT "$B2" "$(ccache -s)"
         fi
-        sleep 120
-        BUILD_STATS=$(tail <"ErrorLog.txt" -n 1 | awk '{ print $2 }')
-        TGEDIT "$B3" "$(T1)=$BUILD_STATS" && TGEDIT "$B2" "$(ccache -s)"
     done
-    kill %1
-    TGEDIT "$INFO" "$TEXT2""$NL""$(T1):Killed FOR CCACHE UPLOAD"
 else
     while test ! -z "$(pidof soong_ui)"; do
         sleep 120
@@ -130,7 +131,7 @@ for B4 in *txt; do
         break
     fi
 done
-TGDOC "./out/*log" "$(DEL ./out/*log)"
+TGDOC "./out/*log" "$(DEL ./out/*log)" || exit
 
 # Upload Rom If Zip Found
 if ls /tmp/rom/out/target/product/mido/*zip 1>/dev/null 2>&1; then
