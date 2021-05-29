@@ -8,8 +8,8 @@ export ID="$chatid"
 export BUILD_TYPE="ccache" # final or ccache
 export METALAVA="true"
 export CCACHESIZE="20G"
-export LUNCHCOMMAND="lunch corvus_mido-user"
-export BUILDCOMMAND="make corvus"
+export LUNCHCOMMAND="lunch aosp_mido-user"
+export BUILDCOMMAND=" m aex -j$(nproc --all)"
 #--------------------------EDIT UPTO HERE--------------------------------
 
 # Functions And imp stuff
@@ -69,7 +69,7 @@ TGDOC "stats.md" "New build starts"
 export USE_CCACHE=1
 export CCACHE_DIR="/tmp/ccache"
 export CCACHE_EXEC="$(which ccache)"
-export CCACHE_COMPILERCHECK="none"
+export CCACHE_COMPILERCHECK=content
 ccache -M "$CCACHESIZE"
 ccache -o compression=true
 TG "$(ccache -s)"
