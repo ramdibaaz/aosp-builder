@@ -7,7 +7,7 @@ cd /tmp/rom || exit
 echo "$apicode" >>./script1.sh && chmod +x ./script1.sh && bash ./script1.sh
 
 # Repo init
-repo init -q --no-repo-verify --depth=1 -u https://github.com/AospExtended/manifest.git -b 11 -g default,-device,-mips,-darwin,-notdefault
+repo init -q --no-repo-verify --depth=1 -u https://github.com/AospExtended/manifest.git -b 11.x -g default,-device,-mips,-darwin,-notdefault
 
 # Local Manifest
 git clone --depth=1 git://github.com/jrchintu/local_manifest.git -b aex .repo/local_manifests
