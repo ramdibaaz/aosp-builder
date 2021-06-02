@@ -1,36 +1,24 @@
 env: # Environment variables to pass to all tasks
-    CIRRUS_CLONE_DEPTH: 1
-    CIRRUS_WORKING_DIR: "/tmp/ci"
+    CIRRUS_CLONE_DEPTH: 1 # No need to clone with the whole history
+    CIRRUS_WORKING_DIR: "/tmp/ci" # Where to clone the aosp-builder repo
 
+    # For rclone with google drive or any cloud! After first commit pushing, login to https://cirrus-ci.com , click top left corner 3 dot menu, click repository(yourname/aosp-builder) > Repository Settings > Secured Variables > enter content of ~/.config/rclone/rclone.conf (from pc where you setup rclone) > ENCRYPT, copy that ENCRYPTED hash
     rclone_config: "ENCRYPTED[58fe878a01da727d9d753c2c36a81abb2c8fc23e7d85017625b11adeeeeb862e26081f6594e4e7e1964633e63be3a4c0]"
 
 task:
-    name: descendant
-    timeout_in: 120m
+    name: RMX1941-descendant # Project name
+    timeout_in: 120m # Otherwise it will timeout at 60m automatically, 120m highest in free account
     container:
-      image: apon77/aosp:latest
-      cpu: 4
-      memory: 16G
-    download_ccache_background_script:
-      - set -evx
-      - command=$(head /tmp/ci/ccache.sh -n $(expr $(grep upload /tmp/ci/ccache.sh -n | cut -f1 -d:) - 1))
-      - bash -c "$command"
-    sync_script:
-      - set -evx
-      - command=$(head /tmp/ci/build.sh -n $(expr $(grep "# build" /tmp/ci/build.sh -n | cut -f1 -d:) - 1))
-      - bash -c "$command"
-    monitor_background_script:
-      - ./monitor
-    build_script:
-      - set -evx
-      - command=$(tail /tmp/ci/build.sh -n +$(expr $(grep "# build" /tmp/ci/build.sh -n | cut -f1 -d:) + 2) | head -n -16)
-      - bash -c "$command"
-    upload_rom_script:
-      - set -evx
-      - command=$(tail /tmp/ci/build.sh -n +$(expr $(grep "# upload" /tmp/ci/build.sh -n | cut -f1 -d:) + 2))
-      - bash -c "$command"
-    upload_ccache_script:
-      - set -evx
-      - command=$(tail /tmp/ci/ccache.sh -n +$(expr $(grep "# upload" /tmp/ci/ccache.sh -n | cut -f1 -d:) + 2))
-      - bash -c "$command"
-
+      image: apon77/aosp:latest # It has built-in setup environment + repo, aria2, rclone, pigz, username ci, and email ci@ci.ci [You can use your own docker image if you want, or you can use this one too!]
+      cpu: 4 #8 or less cpu for dummy build, 8 cpu for the final build, 8cpu highest for free accounts. Don't try to use more than 8cpu as free user, you may get blocked by ci.
+      memory: 16G # So that we can have ram when needed, 32G highest
+    download_ccache_background_script: # To download ccache in background
+      - ./download_ccache # Ccache download script
+    sync_script: # To sync source
+      - ./sync # Source sync script
+    monitor_background_script: # To monitor ccache and machine status every minute, runs in background
+      - ./monitor # Monitor script
+    build_script: # Actual build script foreground
+      - ./build # Build script to run build
+    upload_ccache_script: # Upload ccache to cloud foreground
+      - ./upload_ccache # Ccache uploading script
