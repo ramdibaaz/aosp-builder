@@ -5,7 +5,6 @@ source build/envsetup.sh
 
 lunch descendant_RMX1941-descendant
 
-mka descendant
 
 
 export CCACHE_DIR=/tmp/ccache
