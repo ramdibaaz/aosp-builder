@@ -20,8 +20,8 @@ function DEL() {
 # FINAL BUILD STEPS
 source build/envsetup.sh
 lunch aosp_mido-user
-make init
-make sepolicy
+#make init
+#make sepolicy
 make bootimage
 
 # TMATE {USE IF FAIL ELSE EXIT}
