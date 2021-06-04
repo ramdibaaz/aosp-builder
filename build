@@ -20,19 +20,19 @@ function DEL() {
 # FINAL BUILD STEPS
 source build/envsetup.sh
 lunch aosp_mido-user
-make init 
+make init
 make sepolicy
 make bootimage
 
 # TMATE {USE IF FAIL ELSE EXIT}
 EXITCODE=$?
-if [ $EXITCODE -ne 0 ]; then 
-        tmate -S /tmp/tmate.sock new-session -d &&
+if [ $EXITCODE -ne 0 ]; then
+    tmate -S /tmp/tmate.sock new-session -d &&
         tmate -S /tmp/tmate.sock wait tmate-ready &&
         SENDSHELL=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') &&
         TG "$SENDSHELL"
-        sleep 120m
+    sleep 120m
 else
-     echo all sucessfull now go awey
-     exit 1
+    echo all sucessfull now go awey
+    exit 1
 fi
