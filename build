@@ -5,11 +5,11 @@ cd /tmp/rom || exit
 #--------------------------EDIT FROM HERE--------------------------------
 export BOTAPI="$mybot"
 export ID="$chatid"
-export BUILD_TYPE="ccache" # final or ccache
-export METALAVA="true"
+export BUILD_TYPE="final" # final or ccache
+export TEST="true"
 export CCACHESIZE="20G"
 export LUNCHCOMMAND="lunch aosp_mido-user"
-export BUILDCOMMAND=" m aex -j$(nproc --all)"
+export BUILDCOMMAND="m bootimage -j$(nproc --all)"
 #--------------------------EDIT UPTO HERE--------------------------------
 
 # Functions And imp stuff
@@ -65,32 +65,20 @@ export NL=$'\n'
 curl https://raw.githubusercontent.com/ramdibaaz/aosp-builder/main/extra.sh >>extra.sh && chmod +x ./extra.sh && bash extra.sh
 TGDOC "stats.md" "New build starts"
 
-# Ccache
-export USE_CCACHE=1
-export CCACHE_DIR="/tmp/ccache"
-export CCACHE_EXEC="$(which ccache)"
-export CCACHE_COMPILERCHECK=content
-ccache -M "$CCACHESIZE"
-ccache -o compression=true
-TG "$(ccache -s)"
-export B2="$M_ID"
-
 # Build Info notification
-TG "$(date)""$NL""IP:$(curl ipinfo.io/ip) By $USER""$NL""Type:$BUILD_TYPE Metalava:$METALAVA""$NL""ccache:$CCACHESIZE cores:$(nproc)""$NL""+++++++++++++++++++++"
+TG "$(date)""$NL""IP:$(curl ipinfo.io/ip) By $USER""$NL""Type:$BUILD_TYPE TESTBUILD:$TEST""$NL""ccache:$CCACHESIZE cores:$(nproc)""$NL""+++++++++++++++++++++"
 export INFO="$M_ID"
 
 # Before build Steps
 source ./build/envsetup.sh && eval "$LUNCHCOMMAND"
 TGEDIT "$INFO" "$TEXT1""$NL""$(T1):Env Setup And Lunch"
 
-# Make Metalava Seperately
-if [[ "$METALAVA" = "true" ]]; then
-    TGEDIT "$INFO" "$TEXT2""$NL""$(T1):Metalava Build Started"
-    export WITHOUT_CHECK_API=true
-    make api-stubs-docs || echo SKIPPING
-    make system-api-stubs-docs || echo SKIPPING
-    make test-api-stubs-docs || echo SKIPPING
-    TGEDIT "$INFO" "$TEXT2""$NL""$(T1):Metalava Build Done"
+# Make TEST Seperately
+if [[ "$TEST1" = "true" ]]; then
+    TGEDIT "$INFO" "$TEXT2""$NL""$(T1):TEST BUILD STARTED"
+    m init
+    m sepolicy
+    TGEDIT "$INFO" "$TEXT2""$NL""$(T1):TEST BUILD DONE"
 fi
 
 # Final Build Start's Here
@@ -110,14 +98,14 @@ if [[ "$BUILD_TYPE" = "ccache" ]]; then
         else
             sleep 120
             BUILD_STATS=$(tail <"ErrorLog.txt" -n 1 | awk '{ print $2 }')
-            TGEDIT "$B3" "$(T1)=$BUILD_STATS" && TGEDIT "$B2" "$(ccache -s)"
+            TGEDIT "$B3" "$(T1)=$BUILD_STATS"
         fi
     done
 else
     while test ! -z "$(pidof soong_ui)"; do
         sleep 120
         BUILD_STATS=$(tail <"ErrorLog.txt" -n 1 | awk '{ print $2 }')
-        TGEDIT "$B3" "$(T1)=$BUILD_STATS" && TGEDIT "$B2" "$(ccache -s)"
+        TGEDIT "$B3" "$(T1)=$BUILD_STATS"
     done
 fi
 
@@ -150,16 +138,6 @@ else
         SENDSHELL=$(tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}') &&
         TGEDIT "$INFO" "$TEXT2""$NL""$(T1):Build Failed OR Zip Not Found" &&
         TG "$SENDSHELL"
-fi
-
-# Upload ccache
-if [[ "$BUILD_TYPE" = "ccache" ]]; then
-    cd /tmp || exit
-    TGEDIT "$INFO" "$TEXT2""$NL""$(T1):Uploading ccache"
-    COM ccache 1
-    rclone copy ccache.tar.gz GDUP:ROM/CCACHE
-    TGEDIT "$INFO" "$TEXT2""$NL""$(T1):Ccache Uploaded"
-    cd /tmp/rom || exit
 fi
 
 # sleep while tmate is running

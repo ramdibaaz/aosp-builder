@@ -14,4 +14,4 @@ git clone --depth=1 git://github.com/jrchintu/local_manifest.git -b aex .repo/lo
 
 # Sync source
 repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j 30 ||
-    repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j 8
+    repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j 4
